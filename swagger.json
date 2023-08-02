@@ -1,8 +1,7 @@
 {
     "openapi": "3.0.1",
     "info": {
-        "title": "ImageResizer",
-        "version": "1.0"
+        "title": "ImageResizer"
     },
     "paths": {
         "/optimize": {
@@ -10,10 +9,12 @@
                 "tags": [
                     "ImageResizer"
                 ],
+                "summary": "Конвертирование изображение и уменьшение размера по самой большой стороне",
                 "parameters": [
                     {
                         "name": "src",
                         "in": "query",
+                        "description": "Ссылка на изображение, спец символы должны быть кодированы в UTF-8 (например методом encodeURIComponent в js)",
                         "style": "form",
                         "schema": {
                             "type": "string"
@@ -22,6 +23,7 @@
                     {
                         "name": "imageFormat",
                         "in": "query",
+                        "description": "Формат изображения, по умолчанию jpg",
                         "style": "form",
                         "schema": {
                             "$ref": "#/components/schemas/ImageFormat"
@@ -30,11 +32,23 @@
                     {
                         "name": "size",
                         "in": "query",
+                        "description": "Размер по самой большой стороне",
                         "style": "form",
                         "schema": {
                             "type": "integer",
                             "format": "int32",
                             "default": 500
+                        }
+                    },
+                    {
+                        "name": "quality",
+                        "in": "query",
+                        "description": "Качество изображения, от 1 до 100 для форматов jpg и webp, по умолчанию 75",
+                        "style": "form",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 75
                         }
                     }
                 ],

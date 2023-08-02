@@ -31,7 +31,7 @@ public class ImageResizer : IImageResizer
             image.Mutate(x => x.Resize((int)(width * ratio), (int)(height * ratio)));
         }
         using var imageStream = new MemoryStream();
-        var imageEncoder = GetImageEncoder(imageParameters.ImageFormat);
+        var imageEncoder = GetImageEncoder(imageParameters);
         await image.SaveAsync(imageStream, imageEncoder, cancellationToken);
 
         var extension = GetExtension(imageParameters.ImageFormat);
@@ -50,19 +50,25 @@ public class ImageResizer : IImageResizer
         return imageFormat.ToString();
     }
 
-    private IImageEncoder GetImageEncoder(ImageFormat imageFormat)
+    private IImageEncoder GetImageEncoder(ImageParameters imageParameters)
     {
-        switch (imageFormat)
+        switch (imageParameters.ImageFormat)
         {
             case ImageFormat.jpeg:
-                return new JpegEncoder();
+                return new JpegEncoder
+                {
+                    Quality = imageParameters.Quality,
+                };
             case ImageFormat.png:
                 return new PngEncoder();
             case ImageFormat.webp:
-                return new WebpEncoder();
+                return new WebpEncoder
+                {
+                    Quality = imageParameters.Quality,
+                };
             default:
-                _logger.LogError("{imageFormat} does not have a suitable encoder", imageFormat);
-                throw new ArgumentException($"{imageFormat} does not have a suitable encoder");
+                _logger.LogError("{imageFormat} does not have a suitable encoder", imageParameters.ImageFormat);
+                throw new ArgumentException($"{imageParameters.ImageFormat} does not have a suitable encoder");
         }
     }
 }

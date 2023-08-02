@@ -7,4 +7,6 @@ public record class ImageParameters
     public int Size { get; init; }
 
     public ImageFormat ImageFormat { get; init; }
+
+    public int Quality { get; init; } = 75;
 }
