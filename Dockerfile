@@ -10,6 +10,6 @@ RUN dotnet publish ImageResizer.sln -c Release -o /publish
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 as runtime
 WORKDIR /publish
 COPY --from=build-env /publish .
-ENV AllowedDomain hsto.org
+ENV AllowedDomain blackrays.ru
 EXPOSE 80
 ENTRYPOINT ["dotnet", "ImageResizer.dll"]

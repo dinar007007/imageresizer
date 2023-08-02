@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Text;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
 
@@ -19,6 +18,7 @@ public class ImageGetter : IImageGetter
 
     public async Task<Image> GetImageAsync(string url)
     {
+        _logger.LogInformation("Start getting image", url);
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
         var httpResponseMessage = await _httpClient.SendAsync(request);
         if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
