@@ -26,35 +26,36 @@ public class ImageGetter : IImageGetter
             _logger.LogError("Http code on {url} not equal 200", url);
         }
 
-        var (filename, imageFormat) = GetFilename(httpResponseMessage.Content.Headers, url);
+        var filename = GetFilename(httpResponseMessage.Content.Headers, url);
 
         var image = new Image(
             await httpResponseMessage.Content.ReadAsByteArrayAsync(),
-            imageFormat,
+            ImageFormat.png,
             filename);
 
         return image;
     }
 
-    private (string, ImageFormat) GetFilename(HttpContentHeaders httpContentHeader, string url)
+    private string GetFilename(HttpContentHeaders httpContentHeader, string url)
     {
         if (httpContentHeader.ContentDisposition is not null && httpContentHeader.ContentDisposition.FileName is not null)
         {
-            return (Path.GetFileNameWithoutExtension(httpContentHeader.ContentDisposition.FileName),
-                    Utils.GetImageFormat(httpContentHeader.ContentDisposition.FileName));
+            return Path.GetFileNameWithoutExtension(httpContentHeader.ContentDisposition.FileName);
         }
         try
         {
             httpContentHeader.TryGetValues("Content-Disposition", out var contentDisposition);
+            var uri = new Uri(url);
             if (contentDisposition is null || !contentDisposition.Any())
             {
-                var uri = new Uri(url);
-                return (Path.GetFileNameWithoutExtension(uri.Segments[^1]),
-                    Utils.GetImageFormat(uri.Segments[^1]));
+                return Path.GetFileNameWithoutExtension(uri.Segments[^1]);
             }
             var fileName = Uri.UnescapeDataString(contentDisposition.First().Split('\'')[^1]).TrimEnd(';');
-            return (Path.GetFileNameWithoutExtension(fileName),
-                    Utils.GetImageFormat(fileName));
+            if (fileName == "inline")
+            {
+                return uri.Segments[^1].ToString();
+            }
+            return Path.GetFileNameWithoutExtension(fileName);
 
         }
         catch (Exception ex)

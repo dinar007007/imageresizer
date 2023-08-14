@@ -20,8 +20,8 @@ public class ImageResizer : IImageResizer
 
     public async Task<Image> Resize(ImageParameters imageParameters, CancellationToken cancellationToken = default)
     {
-        var ImageToResize = await _imageGetter.GetImageAsync(imageParameters.Url);
-        var image = SixLabors.ImageSharp.Image.Load(ImageToResize.ImageData);
+        var imageToResize = await _imageGetter.GetImageAsync(imageParameters.Url);
+        var image = SixLabors.ImageSharp.Image.Load(imageToResize.ImageData);
         var width = image.Width;
         var height = image.Height;
         var maxSize = Math.Max(width, height);
@@ -35,7 +35,10 @@ public class ImageResizer : IImageResizer
         await image.SaveAsync(imageStream, imageEncoder, cancellationToken);
 
         var extension = GetExtension(imageParameters.ImageFormat);
-        var resizedImage = new Image(imageStream.ToArray(), imageParameters.ImageFormat, ImageToResize.FileName);
+        var resizedImage = new Image(
+            imageStream.ToArray(),
+            imageParameters.ImageFormat,
+            imageToResize.FileName + "." + imageParameters.ImageFormat);
         _logger.LogInformation(
             "Image from url {url} resized to format {format} with size {size}",
             imageParameters.Url,
